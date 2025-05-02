@@ -1,0 +1,14 @@
+[project]
+name = "roboticarm"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "ikfast",
+    "urbasic",
+]
+
+[tool.uv.sources]
+urbasic = { git = "https://github.com/6figuress/ur3e-control.git" }
+ikfast = { git = "https://github.com/6figuress/ur3e-ik.git", rev = "a21efeb00d28e46912b960404ea4d0d38476bb21"}
