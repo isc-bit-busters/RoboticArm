@@ -5,6 +5,8 @@ from scipy.spatial.transform import Rotation
 # Mock imports assuming they exist in your environment
 from ur_ikfast.ur_kinematics import URKinematics, MultiURKinematics
 
+execute = False
+
 def norm_to_quat(normal):
     if np.allclose(normal, [0, 0, 0]):
         raise ValueError("Cannot normalize a zero vector (normal is [0, 0, 0])")
@@ -91,11 +93,19 @@ def generate_joints_from_data(data_6d, output_file="trajectory.json"):
 
 # Example usage
 if __name__ == "__main__":
-    # Each tuple is (x, y, z, nx, ny, nz)
+    trajectory_file_name = "trajectory.json"
     data = [
         (0.3, 0.2, 0.22, 0, 0, -1),
         (0.34, 0.2, 0.22, 0, 0, -1),
         (0.3, 0.22, 0.22, 0, 0, -1),
         (0.31, 0.25, 0.22, 0, 0, -1),
     ]
-    generate_joints_from_data(data, "trajectory.json")
+    generate_joints_from_data(data, trajectory_file_name)
+
+    if execute:
+        from executeJSON import ISCoinTrajectoryExecutor
+        host_ip = "10.30.5.159"
+        # host_ip = "10.30.5.158"
+        executor = ISCoinTrajectoryExecutor(host=host_ip, trajectory_file=trajectory_file_name)
+        executor.connect()
+        executor.execute_trajectory()
