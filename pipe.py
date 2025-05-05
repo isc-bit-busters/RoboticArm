@@ -101,6 +101,7 @@ if __name__ == "__main__":
         (0.31, 0.25, 0.22, 0, 0, -1),
     ]
     generate_joints_from_data(data, trajectory_file_name)
+    execute = True
 
     if execute:
         from executeJSON import ISCoinTrajectoryExecutor
