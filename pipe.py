@@ -63,7 +63,7 @@ def generate_trajectory_file(data, filename):
 
     print(f"Trajectory file '{filename}' generated successfully.")
 
-def generateTrajectoryFromPoses(poses, filename="trajectory.json", graph=False, verbose=False):
+def generateTrajectoryFromPoses(poses, filename=None, verbose=False):
     kine = URKinematics("ur3e_gripper")
     multi = MultiURKinematics(kine)
 
@@ -74,7 +74,8 @@ def generateTrajectoryFromPoses(poses, filename="trajectory.json", graph=False, 
 
     print(f"Number of angles: {len(angles.trajectory)}")
     print(f"angles: {angles.trajectory}")
-    generate_trajectory_file(angles.trajectory, filename)
+    if filename is not None:
+        generate_trajectory_file(angles.trajectory, filename)
 
     if verbose:
         number_angles = len(angles.trajectory)
@@ -82,17 +83,30 @@ def generateTrajectoryFromPoses(poses, filename="trajectory.json", graph=False, 
         ratio = number_angles / number_points
         print(f"Number of poses: {number_points}, Number of angles: {number_angles}, Ratio: {ratio}")
 
-def generate_joints_from_data(data_6d, output_file="trajectory.json"):
+    return angles.trajectory
+
+
+def generate_joint_from_data(data_6d, output_file=None):
+    if len(data_6d) != 6:
+        raise ValueError("data_6d must contain exactly 6 elements.")
+    x, y, z, nx, ny, nz = data_6d
+    quat = norm_to_quat(np.array([nx, ny, nz]))
+    pose = [x, y, z] + list(quat)
+
+    return generateTrajectoryFromPoses([pose], filename=output_file, verbose=True)
+
+def generate_joints_from_data(data_6d, output_file=None):
     poses = []
     for x, y, z, nx, ny, nz in data_6d:
         quat = norm_to_quat(np.array([nx, ny, nz]))
         pose = [x, y, z] + list(quat)
         poses.append(pose)
 
-    generateTrajectoryFromPoses(poses, filename=output_file, graph=True, verbose=True)
+    return generateTrajectoryFromPoses(poses, filename=output_file, verbose=True)
 
 # Example usage
 if __name__ == "__main__":
+    execute = True
     trajectory_file_name = "trajectory.json"
     data = [
         (0.3, 0.2, 0.22, 0, 0, -1),
@@ -100,13 +114,25 @@ if __name__ == "__main__":
         (0.3, 0.22, 0.22, 0, 0, -1),
         (0.31, 0.25, 0.22, 0, 0, -1),
     ]
-    generate_joints_from_data(data, trajectory_file_name)
-    execute = True
+    poses = generate_joints_from_data(data)
+    # poses = generate_joints_from_data(data, trajectory_file_name)
 
+    single_point = (0.3, 0.2, 0.22, 0, 0, -1)
+    signle_pose = generate_joint_from_data(single_point)
+
+    # generate_joints_from_data(data, "trajectory_file_name_test.json")
     if execute:
         from executeJSON import ISCoinTrajectoryExecutor
         host_ip = "10.30.5.159"
         # host_ip = "10.30.5.158"
-        executor = ISCoinTrajectoryExecutor(host=host_ip, trajectory_file=trajectory_file_name)
+        executor = ISCoinTrajectoryExecutor(host=host_ip)
         executor.connect()
-        executor.execute_trajectory()
+        # trajectory = executor.read_trajectory("trajectory.json")
+        # executor.execute_trajectory(trajectory)
+
+        executor.execute_trajectory(poses)
+
+        # point = executor.read_trajectory("trajectory_file_name_test.json")
+        # executor.go_to_point(point[0]["positions"])
+
+        executor.go_to_point(signle_pose)
