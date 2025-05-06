@@ -81,14 +81,22 @@ class ArmAgent(Agent):
                             msg_type="arm_log"
                         )
                     elif msg_type == "activate_gripper":
-                        self.iscoin_executor.activate_gripper()
-                        self.gripper_activated = True
-                        print("Gripper activated", flush=True)
-                        send_log_message(
-                            body="Gripper activated",
-                            sender_id="armClient",
-                            msg_type="arm_log"
-                        )
+                        if not self.gripper_activated:
+                            self.iscoin_executor.activate_gripper()
+                            self.gripper_activated = True
+                            print("Gripper activated", flush=True)
+                            send_log_message(
+                                body="Gripper activated",
+                                sender_id="armClient",
+                                msg_type="arm_log"
+                            )
+                        else:
+                            print("Gripper already activated", flush=True)
+                            send_log_message(
+                                body="Gripper already activated",
+                                sender_id="armClient",
+                                msg_type="arm_log"
+                            )
                     elif msg_type == "open_gripper":
                         if self.gripper_activated:
                             self.iscoin_executor.open_gripper()
