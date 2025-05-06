@@ -93,7 +93,8 @@ def generate_joint_from_data(data_6d, output_file=None):
     quat = norm_to_quat(np.array([nx, ny, nz]))
     pose = [x, y, z] + list(quat)
 
-    return generateTrajectoryFromPoses([pose], filename=output_file, verbose=True)
+    trajectory = generateTrajectoryFromPoses([pose], filename=output_file, verbose=True)
+    return trajectory[0]
 
 def generate_joints_from_data(data_6d, output_file=None):
     poses = []
@@ -115,24 +116,20 @@ if __name__ == "__main__":
         (0.31, 0.25, 0.22, 0, 0, -1),
     ]
     poses = generate_joints_from_data(data)
-    # poses = generate_joints_from_data(data, trajectory_file_name)
 
-    single_point = (0.3, 0.2, 0.22, 0, 0, -1)
+    single_point = (0.3, 0.2, 0.26, 0, 0, -1)
     signle_pose = generate_joint_from_data(single_point)
 
-    # generate_joints_from_data(data, "trajectory_file_name_test.json")
     if execute:
         from executeJSON import ISCoinTrajectoryExecutor
         host_ip = "10.30.5.159"
         # host_ip = "10.30.5.158"
         executor = ISCoinTrajectoryExecutor(host=host_ip)
         executor.connect()
-        # trajectory = executor.read_trajectory("trajectory.json")
-        # executor.execute_trajectory(trajectory)
 
         executor.execute_trajectory(poses)
 
-        # point = executor.read_trajectory("trajectory_file_name_test.json")
-        # executor.go_to_point(point[0]["positions"])
+        print(f"Executing trajectory of {len(data)} points finished.")
 
         executor.go_to_point(signle_pose)
+        print(f"Executing single point finished.")
