@@ -33,7 +33,7 @@ class ArmAgent(Agent):
                 robot_id = msg.metadata.get("robot_id", "unknown")
                 msg_type = msg.metadata.get("type", "unknown")
                 print(f"Received message from {robot_id} of type {msg_type}", flush=True)
-                body = msg.body.strip()
+                body = msg.body.strip() if msg.body is not None else ""
 
                 try:
                     if msg_type == "set_host_ip":
