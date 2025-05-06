@@ -1,15 +1,16 @@
-# services:
-  # roboticarm:
-  #   build: .
-  #   container_name: roboticarm_container
-  #   network_mode: host
-  #   volumes:
-  #     - .:/app
-  #   command: python pipe.py
-
 services:
   roboticarm:
-    build:
-      context: https://github.com/isc-bit-busters/RoboticArm.git
+    build: .
     container_name: roboticarm_container
     network_mode: host
+    volumes:
+      - .:/app
+    extra_hosts:
+      - "prosody:192.168.88.253"
+
+# services:
+#   roboticarm:
+#     build:
+#       context: https://github.com/isc-bit-busters/RoboticArm.git
+#     container_name: roboticarm_container
+#     network_mode: host
