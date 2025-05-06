@@ -2,7 +2,6 @@ services:
   roboticarm:
     build: .
     container_name: roboticarm_container
-    network_mode: host
     volumes:
       - .:/app
     extra_hosts:
@@ -13,4 +12,3 @@ services:
 #     build:
 #       context: https://github.com/isc-bit-busters/RoboticArm.git
 #     container_name: roboticarm_container
-#     network_mode: host
