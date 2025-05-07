@@ -48,11 +48,18 @@ class ArmAgent(Agent):
                             msg_type="arm_log"
                         )
                         self.connect_executor()
-                        send_log_message(
-                            body="ISCoin executor connected",
-                            sender_id="armClient", 
-                            msg_type="arm_log"
-                        )
+                        if self.iscoin_executor:
+                            send_log_message(
+                                body="✅ Connected to ISCoin at {self.host_ip}",
+                                sender_id="armClient", 
+                                msg_type="arm_log"
+                            )
+                        else:
+                            send_log_message(
+                                body="❌ Failed to connect to ISCoin executor",
+                                sender_id="armClient", 
+                                msg_type="arm_log"
+                            )
                     elif self.iscoin_executor is None:
                         print("ISCoin executor not connected. Please set the host IP first.", flush=True)
                         send_log_message(
