@@ -1,4 +1,7 @@
-ikfast @ git+https://github.com/6figuress/ur3e-ik.git@a21efeb00d28e46912b960404ea4d0d38476bb21
+# ikfast @ git+https://github.com/6figuress/ur3e-ik.git@a21efeb00d28e46912b960404ea4d0d38476bb21
+ikfast @ git+https://github.com/isc-bit-busters/ur3e-ik.git
 urbasic @ git+https://github.com/6figuress/ur3e-control.git
-security @ git+https://github.com/6figuress/SecurityModule.git
+# security @ git+https://github.com/6figuress/SecurityModule.git
+security @ git@github.com:isc-bit-busters/SecurityModule.git
 simulator @ git+https://github.com/6figuress/phys_simulator.git
+spade==3.3.3
