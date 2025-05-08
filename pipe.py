@@ -70,7 +70,7 @@ def generateTrajectoryFromPoses(poses, filename=None, verbose=False):
     print(f"Number of poses: {len(poses)}")
     print(f"poses: {poses}")
 
-    angles = multi.inverse_optimal(poses)
+    angles = multi.inverse_optimal(poses, logs=verbose)
 
     print(f"Number of angles: {len(angles.trajectory)}")
     print(f"angles: {angles.trajectory}")
@@ -107,29 +107,64 @@ def generate_joints_from_data(data_6d, output_file=None):
 
 # Example usage
 if __name__ == "__main__":
-    execute = True
-    trajectory_file_name = "trajectory.json"
-    data = [
-        (0.3, 0.2, 0.22, 0, 0, -1),
-        (0.34, 0.2, 0.22, 0, 0, -1),
-        (0.3, 0.22, 0.22, 0, 0, -1),
-        (0.31, 0.25, 0.22, 0, 0, -1),
-    ]
-    poses = generate_joints_from_data(data)
+    # execute = True
+    # trajectory_file_name = "trajectory.json"
+    # data = [
+    #     (0.3, 0.2, 0.22, 0, 0, -1),
+    #     (0.34, 0.2, 0.22, 0, 0, -1),
+    #     (0.3, 0.22, 0.22, 0, 0, -1),
+    #     (0.31, 0.25, 0.22, 0, 0, -1),
+    # ]
+    # poses = generate_joints_from_data(data)
 
-    single_point = (0.3, 0.2, 0.26, 0, 0, -1)
-    signle_pose = generate_joint_from_data(single_point)
+    # single_point = (0.3, 0.2, 0.26, 0, 0, -1)
+    # signle_pose = generate_joint_from_data(single_point)
+
+    # if execute:
+    #     from executeJSON import ISCoinTrajectoryExecutor
+    #     host_ip = "10.30.5.159"
+    #     # host_ip = "10.30.5.158"
+    #     executor = ISCoinTrajectoryExecutor(host=host_ip)
+    #     executor.connect()
+
+    #     executor.execute_trajectory(poses)
+
+    #     print(f"Executing trajectory of {len(data)} points finished.")
+
+    #     executor.go_to_point(signle_pose)
+    #     print(f"Executing single point finished.")
+
+    from executeJSON import ISCoinTrajectoryExecutor
+    ip = "10.30.5.159"
+
+    execute = False
 
     if execute:
-        from executeJSON import ISCoinTrajectoryExecutor
-        host_ip = "10.30.5.159"
-        # host_ip = "10.30.5.158"
-        executor = ISCoinTrajectoryExecutor(host=host_ip)
+        executor = ISCoinTrajectoryExecutor(host=ip)
         executor.connect()
+        executor.activate_gripper()
 
+    points = [
+        (0.31, -0.15, 0.3, 0, 0, -1),
+        (0.31, 0.31, 0.2, 0, 0, -1),
+        (0.31, 0.31, 0.2, 0, 0, -1),
+    ]
+    poses = generate_joints_from_data(points)
+    if execute:
         executor.execute_trajectory(poses)
+        executor.close_gripper()
 
-        print(f"Executing trajectory of {len(data)} points finished.")
+    points = [
 
-        executor.go_to_point(signle_pose)
-        print(f"Executing single point finished.")
+        (0.31, 0.31, 0.16, 0, 0, -1),
+        (0.31, 0.31, 0.17, 0, 0, -1),
+        (0.31, -0.31, 0.26, 0, 0, -1),
+        (0.31, 0.31, 0.30, 1, 0, -1),
+        (0.31, 0.01, 0.35, 1, 0, -1),
+    ]
+
+    poses = generate_joints_from_data(points)
+    if execute:
+        executor.execute_trajectory(poses)
+        executor.open_gripper()
+
