@@ -203,7 +203,8 @@ if __name__ == "__main__":
 
     from executeJSON import ISCoinTrajectoryExecutor
     ip = "10.30.5.159"
-    execute = False  # Set to True to run on hardware
+    execute = True
+    # execute = False  # Set to True to run on hardware
 
     if execute:
         executor = ISCoinTrajectoryExecutor(host=ip)
