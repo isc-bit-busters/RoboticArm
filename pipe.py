@@ -137,17 +137,20 @@ if __name__ == "__main__":
     from executeJSON import ISCoinTrajectoryExecutor
     ip = "10.30.5.159"
 
+    # execute = True
     execute = False
 
     if execute:
         executor = ISCoinTrajectoryExecutor(host=ip)
         executor.connect()
         executor.activate_gripper()
+        executor.open_gripper()
 
     points = [
-        (0.31, -0.15, 0.3, 0, 0, -1),
+        (0.31, -0.1, 0.3, 0, 0, -1),
+        (0.31, 0.31, 0.25, 0, 0, -1),
         (0.31, 0.31, 0.2, 0, 0, -1),
-        (0.31, 0.31, 0.2, 0, 0, -1),
+        (0.31, 0.31, 0.16, 0, 0, -1),
     ]
     poses = generate_joints_from_data(points)
     if execute:
@@ -158,8 +161,9 @@ if __name__ == "__main__":
 
         (0.31, 0.31, 0.16, 0, 0, -1),
         (0.31, 0.31, 0.17, 0, 0, -1),
-        (0.31, -0.31, 0.26, 0, 0, -1),
+        (0.31, 0.31, 0.26, 0, 0, -1),
         (0.31, 0.31, 0.30, 1, 0, -1),
+        (0.31, 0.31, 0.40, 1, 0, -1),
         (0.31, 0.01, 0.35, 1, 0, -1),
     ]
 

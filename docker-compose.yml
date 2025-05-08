@@ -6,6 +6,7 @@ services:
       - .:/app
     extra_hosts:
       - "prosody:192.168.88.253"
+    command: python pipe.py
 
 # services:
 #   roboticarm:
