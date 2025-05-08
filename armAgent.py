@@ -50,7 +50,7 @@ class ArmAgent(Agent):
                         self.connect_executor()
                         if self.iscoin_executor:
                             send_log_message(
-                                body="✅ Connected to ISCoin at {self.host_ip}",
+                                body=f"✅ Connected to ISCoin at {self.host_ip}",
                                 sender_id="armClient", 
                                 msg_type="arm_log"
                             )
