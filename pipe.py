@@ -105,6 +105,31 @@ def generate_joints_from_data(data_6d, output_file=None):
 
     return generateTrajectoryFromPoses(poses, filename=output_file, verbose=True)
 
+def generate_joint_chunks_from_groups(grouped_points, output_file=None, verbose=True):
+    """Given multiple groups of 6D points, optimize them together and split result into chunks per group."""
+    all_poses = []
+    group_sizes = []
+
+    for group in grouped_points:
+        group_poses = []
+        for x, y, z, nx, ny, nz in group:
+            quat = norm_to_quat(np.array([nx, ny, nz]))
+            pose = [x, y, z] + list(quat)
+            group_poses.append(pose)
+        all_poses.extend(group_poses)
+        group_sizes.append(len(group_poses))
+
+    full_trajectory = generateTrajectoryFromPoses(all_poses, filename=output_file, verbose=verbose)
+
+    # Split the optimized trajectory into chunks matching the original input groups
+    chunks = []
+    start = 0
+    for size in group_sizes:
+        chunks.append(full_trajectory[start:start + size])
+        start += size
+
+    return chunks
+
 # Example usage
 if __name__ == "__main__":
     # execute = True
@@ -134,6 +159,8 @@ if __name__ == "__main__":
     #     executor.go_to_point(signle_pose)
     #     print(f"Executing single point finished.")
 
+
+#  ----------------------------------------
     from executeJSON import ISCoinTrajectoryExecutor
     ip = "10.30.5.159"
 
@@ -172,3 +199,45 @@ if __name__ == "__main__":
         executor.execute_trajectory(poses)
         executor.open_gripper()
 
+#  -----------------------------------------
+
+    from executeJSON import ISCoinTrajectoryExecutor
+    ip = "10.30.5.159"
+    execute = False  # Set to True to run on hardware
+
+    if execute:
+        executor = ISCoinTrajectoryExecutor(host=ip)
+        executor.connect()
+        executor.activate_gripper()
+        executor.open_gripper()
+
+    # Provide multiple groups of points
+    groups = [
+        # First movement group
+        [
+            (0.31, -0.1, 0.3, 0, 0, -1),
+            (0.31, 0.31, 0.25, 0, 0, -1),
+            (0.31, 0.31, 0.2, 0, 0, -1),
+            (0.31, 0.31, 0.16, 0, 0, -1),
+        ],
+        # Gripper close and lift group
+        [
+            (0.31, 0.31, 0.17, 0, 0, -1),
+            (0.31, 0.31, 0.26, 0, 0, -1),
+            (0.31, 0.31, 0.30, 1, 0, -1),
+            (0.31, 0.31, 0.40, 1, 0, -1),
+            (0.31, 0.01, 0.35, 1, 0, -1),
+        ],
+    ]
+
+    # Generate optimized chunks
+    joint_chunks = generate_joint_chunks_from_groups(groups)
+
+    for i, chunk in enumerate(joint_chunks):
+        print(f"Executing chunk {i + 1}/{len(joint_chunks)} with {len(chunk)} points.")
+        if execute:
+            executor.execute_trajectory(chunk)
+        if i == 0 and execute:
+            executor.close_gripper()
+        if i == 1 and execute:
+            executor.open_gripper()
