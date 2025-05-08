@@ -8,7 +8,7 @@ from executeJSON import ISCoinTrajectoryExecutor
 import threading
 
 
-from pipe import generate_joint_from_data, generate_joints_from_data
+from pipe import generate_joint_from_data, generate_joints_from_data, generate_joint_chunks_from_groups
 
 
 class ArmAgent(Agent):
@@ -155,6 +155,9 @@ class ArmAgent(Agent):
                             sender_id="armClient",
                             msg_type="arm_log"
                         )
+
+                    elif msg_type == "remove_wall":
+                        await self.remove_wall_sequence()
                     else:
                         print(f"Unknown command type: {msg_type}", flush=True)
                         send_log_message(
@@ -174,6 +177,51 @@ class ArmAgent(Agent):
 
         async def on_end(self):
             await self.agent.stop()
+
+        async def remove_wall_sequence(self):
+            try:
+                self.iscoin_executor.activate_gripper()
+                self.iscoin_executor.open_gripper()
+
+                groups = [
+                    [
+                        (0.31, -0.1, 0.3, 0, 0, -1),
+                        (0.31, 0.31, 0.25, 0, 0, -1),
+                        (0.31, 0.31, 0.2, 0, 0, -1),
+                        (0.31, 0.31, 0.16, 0, 0, -1),
+                    ],
+                    [
+                        (0.31, 0.31, 0.17, 0, 0, -1),
+                        (0.31, 0.31, 0.26, 0, 0, -1),
+                        (0.31, 0.31, 0.30, 1, 0, -1),
+                        (0.31, 0.31, 0.40, 1, 0, -1),
+                        (0.31, 0.01, 0.35, 1, 0, -1),
+                    ],
+                ]
+
+                joint_chunks = generate_joint_chunks_from_groups(groups)
+
+                for i, chunk in enumerate(joint_chunks):
+                    print(f"Executing chunk {i + 1}/{len(joint_chunks)} with {len(chunk)} points", flush=True)
+                    self.iscoin_executor.execute_trajectory(chunk)
+                    if i == 0:
+                        self.iscoin_executor.close_gripper()
+                    if i == 1:
+                        self.iscoin_executor.open_gripper()
+
+                send_log_message(
+                    body="✅ Completed remove_wall sequence.",
+                    sender_id="armClient",
+                    msg_type="arm_log"
+                )
+            except Exception as e:
+                print(f"❌ Failed during remove_wall sequence: {e}", flush=True)
+                send_log_message(
+                    body=f"❌ Failed during remove_wall sequence: {e}",
+                    sender_id="armClient",
+                    msg_type="arm_log"
+                )
+
 
     async def setup(self):
         print("ArmAgent started setup", flush=True)
